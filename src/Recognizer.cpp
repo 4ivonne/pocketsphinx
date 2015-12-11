@@ -648,8 +648,9 @@ void Recognizer::WriteSync(const FunctionCallbackInfo<Value>& args) {
 	if(!instance->hypFinalCallback.IsEmpty() && hyp) {
 		int32 isFinal;
 		const char* hyp2 = ps_get_hyp_final(instance->ps, &isFinal);
+
 		// we check hyp (hyp2) again to be sure it's still not Null
-		Handle<Value> argv[3] = { Null(isolate), hyp2 ? String::NewFromUtf8(isolate,hyp2) : String::NewFromUtf8(isolate, ""), NumberObject::New(isolate, isFinal)};
+		Handle<Value> argv[3] = { Null(isolate), hyp2 ? String::NewFromUtf8(isolate,hyp2) : String::NewFromUtf8(isolate, ""), Boolean::New(isolate, isFinal == 1)};
 	
 		Local<Function> cb = Local<Function>::New(isolate, instance->hypFinalCallback);
 		cb->Call(isolate->GetCurrentContext()->Global(), 3, argv);

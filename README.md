@@ -58,7 +58,7 @@ The PocketSphinx Object itself has the properties
 
 * `Recognizer(options, [hyp])` - Creates a new Recognizer instance
 * `modelDirectory` - The default model directory
-* `fromFloat(buffer)` - Resamples javascript audio buffers to use with PocketSphinx
+* `fromFloat(buffer):buffer` - Resamples javascript audio buffers to use with PocketSphinx
 
 A Recognizer instance has the following methods:
 
@@ -86,11 +86,12 @@ The following events are currently supported
 event | parameters | description
 ------|------------|------------
 `hyp` | `error, hypothesis, score` | When a hypothesis is available. `score` is the path score corresponding to returned string.
-`hypFinal` | `error, hypothesis, isFinal` | When decoding stopped. `isFinal` indicates if hypothesis has reached final state in the grammar.
+`hypFinal` | `error, hypothesis, isFinal` | When a hypothesis is available. `isFinal` indicates if hypothesis has reached final state in the grammar.
 `start` | none | When decoding started.
 `stop` | none | When decoding stopped.
 `speechDetected` | none | When speech was detected the first time.
 `silenceDetected` | none | When silence was detected after speech.
+`error` | `error` | When an error occurred
 
 
 ## Specify a search
