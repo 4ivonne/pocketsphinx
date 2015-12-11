@@ -186,10 +186,6 @@ void Recognizer::Reconfig(const FunctionCallbackInfo<Value>& args) {
 		}
 	}
 
-	// Overwrite callback method
-	Local<Function> cb = Local<Function>::Cast(args[1]);
-	instance->hypCallback.Reset(isolate, cb);
-
 	args.GetReturnValue().Set(args.Holder());
 }
 
