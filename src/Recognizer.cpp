@@ -479,17 +479,6 @@ void Recognizer::Stop(const FunctionCallbackInfo<Value>& args) {
 
 	if(instance->processing == true) {
 
-		// Fetch hyp with isFinal flag
-		// ..and trigger hypFinal callback
-		if(!instance->hypFinalCallback.IsEmpty()) {
-			int32 isFinal;
-			const char* hyp = ps_get_hyp_final(instance->ps, &isFinal);
-			Handle<Value> argv[3] = { Null(isolate), hyp ? String::NewFromUtf8(isolate,hyp) : String::NewFromUtf8(isolate, ""), NumberObject::New(isolate, isFinal)};
-		
-			Local<Function> cb = Local<Function>::New(isolate, instance->hypFinalCallback);
-			cb->Call(isolate->GetCurrentContext()->Global(), 3, argv);
-		}
-
 		// End the utterance
 		int result = ps_end_utt(instance->ps);
 		if(result){
@@ -646,11 +635,23 @@ void Recognizer::WriteSync(const FunctionCallbackInfo<Value>& args) {
 			Stop(args);
 		}
 	}
-
-	Handle<Value> argv[3] = { Null(isolate), hyp ? String::NewFromUtf8(isolate,hyp) : String::NewFromUtf8(isolate, ""), NumberObject::New(isolate,score)};
 	
-	if(!instance->hypCallback.IsEmpty()) {
+	// Trigger hyp callback
+	if(!instance->hypCallback.IsEmpty() && hyp) {
+		Handle<Value> argv[3] = { Null(isolate), String::NewFromUtf8(isolate,hyp), NumberObject::New(isolate,score)};
 		Local<Function> cb = Local<Function>::New(isolate, instance->hypCallback);
+		cb->Call(isolate->GetCurrentContext()->Global(), 3, argv);
+	}
+
+	// Trigger hypFinal callback
+	// ...if hyp is Null already we skip the callback
+	if(!instance->hypFinalCallback.IsEmpty() && hyp) {
+		int32 isFinal;
+		const char* hyp2 = ps_get_hyp_final(instance->ps, &isFinal);
+		// we check hyp (hyp2) again to be sure it's still not Null
+		Handle<Value> argv[3] = { Null(isolate), hyp2 ? String::NewFromUtf8(isolate,hyp2) : String::NewFromUtf8(isolate, ""), NumberObject::New(isolate, isFinal)};
+	
+		Local<Function> cb = Local<Function>::New(isolate, instance->hypFinalCallback);
 		cb->Call(isolate->GetCurrentContext()->Global(), 3, argv);
 	}
 
